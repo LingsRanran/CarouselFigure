@@ -1,0 +1,24 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-size: 0;
+}
+
+.wrapper{
+    transform-style: preserve-3d;
+    position: relative;
+    perspective: 800px;
+    height: 200px;
+    margin-top: 200px;
+}
+
+.wrapper img{
+    position: absolute;
+    width: 300px;
+    height: 200px;
+    left: 50%;
+    top: 50%;
+    margin-left: -150px;
+    margin-top: -100px;
+    border-radius: 10px;
+}
