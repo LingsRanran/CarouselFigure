@@ -2,11 +2,12 @@
  * @Author: Ranran
  * @Date: 2018-07-31 20:36:09
  * @LastEditors: Ranran
- * @LastEditTime: 2018-07-31 21:23:27
+ * @LastEditTime: 2018-08-01 00:35:12
  * @Description: 
  * @Email: ranran0036@163.com
  * @GitHub: github.com/LingsRanran
  */
+
 //实现插件 + 实现轮播图功能
 
 //$.fn.extend  自动轮播
@@ -16,7 +17,7 @@
     function Slider(ele,opt){
         let d = {
             curDisplay:0,
-            autoPlay:true,
+            autoPlay:false,
             interval:2000
         };
 
@@ -30,52 +31,61 @@
         this.autoPlay = this.opts.autoPlay;
         this.timer = null;
         this.interval = this.opts.interval;
+        this.switch = true;
 
         this.init();
     }
 
     Slider.prototype.init = function(){
-        this.initMove();
-        this.bindEvent();
+        let self = this;
+        self.initMove();
+        self.bindEvent();
     }
 
     Slider.prototype.initMove = function(){
         let self = this;
         let hLen = Math.floor(self.imgLen / 2);
         let lNum , rNum;
-        for(let i=0;i<hLen;i++){
+        for (var i = 0; i < hLen; i++) {
             lNum = self.curDisplay - i - 1;
             self.$img.eq(lNum).css({
-                transform:'translateX(' + (-150 * (i + 1)) + 'px) translateZ(' + (200 - i * 100) + 'px)'
-            });
+                transform: 'translateX(' + (-150 * (i + 1)) + 'px) translateZ(' + (200 - i * 100) + 'px) rotateY(30deg)'
+            })
             rNum = self.curDisplay + i + 1;
+            if (rNum > self.imgLen - 1) {
+                rNum -= this.imgLen;
+            }
             self.$img.eq(rNum).css({
-                transform:'translateX(' + (150 * (i + 1)) + 'px) translateZ(' + (200 + i * 100) + 'px)'
+                transform: 'translateX(' + (150 * (i + 1)) + 'px) translateZ(' + (200 - i * 100) + 'px) rotateY(-30deg)'
             });
-
-            self.$img.eq(self.curDisplay).css({
-                transform:'translateZ(300px)'
-            });
+            this.$img.removeClass('on');
         }
+        self.$img.eq(self.curDisplay).css({
+            transform: 'translateZ(300px)'
+        }).addClass('on');
+        this.wrap.on('transitionend', function () {
+            self.switch = true;
+        })
     }
 
     Slider.prototype.bindEvent = function(){
         let self = this;
-        self.$img.on('click',function(){
-            self.nowIndex = $(this).index();
-            self.moving(self,nowIndex);
-        }).hover(function(){
+        self.$img.on('click', function () {
+            if (self.switch && !$(this).hasClass('on')) {
+                self.switch = false;
+                self.nowIndex = $(this).index();
+                self.moving(self.nowIndex);
+            }
+        }).hover(function () {
             clearInterval(self.timer);
-        },function(){
-            this.timer = setInterval(function(){
+        }, function () {
+            self.timer = setInterval(function () {
                 self.play();
-            },self.interval)
+            }, self.interval);
         });
-
-        this.timer = setInterval(function(){
+        this.timer = setInterval(function () {
             self.play();
-        },self.interval)
-
+        }, this.interval);
     }
 
     Slider.prototype.moving = function(index){
